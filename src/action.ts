@@ -79,7 +79,8 @@ export default async function run() {
         提交： ${commitUrl}
         执行者： ${actor}
         部署 ID： ${deployment.id}
-        部署日志：${logs}` }
+        部署日志：${logs}
+        ` }
           })
         }).then(response => {
           if (!response.ok) {
@@ -157,7 +158,8 @@ export default async function run() {
         部署 ID： ${deployment.id}
         别名 URL： ${aliasUrl}
         部署 URL： ${deployment.url}
-        查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}` }
+        查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}
+        ` }
           })
         }).then(response => {
           if (!response.ok) {
