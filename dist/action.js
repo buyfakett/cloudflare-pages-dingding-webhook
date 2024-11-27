@@ -12717,15 +12717,13 @@ async function run() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            at: { isAtAll: true },
             msgtype: "text",
             text: { content: `\u274C CloudFlare Pages ${latestStage.name} \u6D41\u6C34\u7EBF\u9879\u76EE ${project} \u5931\u8D25\uFF01
         \u73AF\u5883\uFF1A ${deployment.environment}
         \u63D0\u4EA4\uFF1A ${commitUrl}
         \u6267\u884C\u8005\uFF1A ${actor}
         \u90E8\u7F72 ID\uFF1A ${deployment.id}
-        \u90E8\u7F72\u65E5\u5FD7\uFF1A${logs}
-        ` }
+        \u90E8\u7F72\u65E5\u5FD7\uFF1A${logs}` }
           })
         }).then((response) => {
           if (!response.ok) {
@@ -12784,7 +12782,6 @@ async function run() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            at: { isAtAll: true },
             msgtype: "text",
             text: { content: `\u2705 CloudFlare Pages \u9879\u76EE\u7684\u90E8\u7F72\u6D41\u6C34\u7EBF\u9879\u76EE ${project} \u6210\u529F\uFF01
         \u73AF\u5883\uFF1A${deployment.environment}
@@ -12793,8 +12790,7 @@ async function run() {
         \u90E8\u7F72 ID\uFF1A ${deployment.id}
         \u522B\u540D URL\uFF1A ${aliasUrl}
         \u90E8\u7F72 URL\uFF1A ${deployment.url}
-        \u67E5\u770B\u6784\u5EFA\u65E5\u5FD7: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}
-        ` }
+        \u67E5\u770B\u6784\u5EFA\u65E5\u5FD7: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}` }
           })
         }).then((response) => {
           if (!response.ok) {
