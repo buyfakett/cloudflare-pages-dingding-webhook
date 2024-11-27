@@ -19,7 +19,8 @@ export default async function run() {
   const project = core.getInput('project', { required: true, trimWhitespace: true });
   const token = core.getInput('githubToken', { required: false, trimWhitespace: true });
   const commitHash = core.getInput('commitHash', { required: false, trimWhitespace: true });
-  const slackWebHook = core.getInput('slackWebHook', { required: false, trimWhitespace: true });
+  const dingWebHookKey = core.getInput('dingWebHookKey', { required: false, trimWhitespace: true });
+  const dingWebHook = dingWebHookKey ? `https://oapi.dingtalk.com/robot/send?access_token=${dingWebHookKey}` : '';
   const commitUrl = context.payload?.head_commit?.url || '';
   const actor = context?.actor || '';
 
@@ -30,7 +31,7 @@ export default async function run() {
 
   const authHeaders: AuthHeaders = apiToken !== '' ? { Authorization: `Bearer ${apiToken}` } : { 'X-Auth-Email': accountEmail, 'X-Auth-Key': apiKey };
 
-  console.log('Waiting for Pages to finish building...');
+  console.log('等待Pages完成构建...');
   let lastStage = '';
 
   while (waiting) {
@@ -39,7 +40,7 @@ export default async function run() {
 
     const deployment: Deployment|undefined = await pollApi(authHeaders, accountId, project, commitHash);
     if (!deployment) {
-      console.log('Waiting for the deployment to start...');
+      console.log('正在等待部署开始...');
       continue;
     }
 
@@ -54,7 +55,7 @@ export default async function run() {
 
     if (latestStage.name !== lastStage) {
       lastStage = deployment.latest_stage.name;
-      console.log('# Now at stage: ' + lastStage);
+      console.log('# 现阶段是: ' + lastStage);
 
       if (!markedAsInProgress) {
         await updateDeployment(token, deployment, 'in_progress');
@@ -65,19 +66,19 @@ export default async function run() {
     if (latestStage.status === 'failed' || latestStage.status === 'failure') {
       waiting = false;
 
-      if (slackWebHook) {
+      if (dingWebHook) {
         const logs = await getCloudflareLogs(authHeaders, accountId, project, deployment.id);
-        fetch(slackWebHook, {
+        fetch(dingWebHook, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: 'text',
-            text: { content: `❌ CloudFlare Pages \`${latestStage.name}\` 流水线项目 *${project}* \`失败\`！
-        环境：*${deployment.environment}*
-        提交：${commitUrl}
-        执行者：*${actor}*
-        部署 ID：*${deployment.id}*
+            text: { content: `❌ CloudFlare Pages \`${latestStage.name}\` 流水线项目 ${project} \`失败\`！
+        环境： ${deployment.environment}
+        提交： ${commitUrl}
+        执行者： ${actor}
+        部署 ID： ${deployment.id}
         部署日志：${logs}` }
           })
         }).then(response => {
@@ -143,20 +144,20 @@ export default async function run() {
       core.setOutput('success', deployment.latest_stage.status === 'success' ? true : false);
 
       if (deployment.latest_stage.status === 'success' && true) {
-        fetch(slackWebHook, {
+        fetch(dingWebHook, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: 'text',
-            text: { content: `✅ CloudFlare Pages 项目的 \`部署\` 流水线 *${project}* \`成功\`！
-        环境：*${deployment.environment}*
+            text: { content: `✅ CloudFlare Pages 项目的 \`部署\` 流水线项目 ${project} \`成功\`！
+        环境：${deployment.environment}
         提交：${commitUrl}
-        执行者：*${actor}*
-        部署 ID：*${deployment.id}*
-        别名 URL：${aliasUrl}
-        部署 URL：${deployment.url}
-        查看 <https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}|构建日志>` }
+        执行者：${actor}
+        部署 ID： ${deployment.id}
+        别名 URL： ${aliasUrl}
+        部署 URL： ${deployment.url}
+        查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}` }
           })
         }).then(response => {
           if (!response.ok) {

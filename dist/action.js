@@ -12677,20 +12677,21 @@ async function run() {
   const project = core.getInput("project", { required: true, trimWhitespace: true });
   const token = core.getInput("githubToken", { required: false, trimWhitespace: true });
   const commitHash = core.getInput("commitHash", { required: false, trimWhitespace: true });
-  const slackWebHook = core.getInput("slackWebHook", { required: false, trimWhitespace: true });
+  const dingWebHookKey = core.getInput("dingWebHookKey", { required: false, trimWhitespace: true });
+  const dingWebHook = dingWebHookKey ? `https://oapi.dingtalk.com/robot/send?access_token=${dingWebHookKey}` : "";
   const commitUrl = ((_b = (_a2 = import_utils.context.payload) == null ? void 0 : _a2.head_commit) == null ? void 0 : _b.url) || "";
   const actor = ((_c = import_utils.context) == null ? void 0 : _c.actor) || "";
   if (!validateAuthInputs(apiToken, accountEmail, apiKey)) {
     return;
   }
   const authHeaders = apiToken !== "" ? { Authorization: `Bearer ${apiToken}` } : { "X-Auth-Email": accountEmail, "X-Auth-Key": apiKey };
-  console.log("Waiting for Pages to finish building...");
+  console.log("\u7B49\u5F85Pages\u5B8C\u6210\u6784\u5EFA...");
   let lastStage = "";
   while (waiting) {
     await sleep();
     const deployment = await pollApi(authHeaders, accountId, project, commitHash);
     if (!deployment) {
-      console.log("Waiting for the deployment to start...");
+      console.log("\u6B63\u5728\u7B49\u5F85\u90E8\u7F72\u5F00\u59CB...");
       continue;
     }
     if (deployment.is_skipped === true) {
@@ -12702,7 +12703,7 @@ async function run() {
     const latestStage = deployment.latest_stage;
     if (latestStage.name !== lastStage) {
       lastStage = deployment.latest_stage.name;
-      console.log("# Now at stage: " + lastStage);
+      console.log("# \u73B0\u9636\u6BB5\u662F: " + lastStage);
       if (!markedAsInProgress) {
         await updateDeployment(token, deployment, "in_progress");
         markedAsInProgress = true;
@@ -12710,19 +12711,19 @@ async function run() {
     }
     if (latestStage.status === "failed" || latestStage.status === "failure") {
       waiting = false;
-      if (slackWebHook) {
+      if (dingWebHook) {
         const logs = await getCloudflareLogs(authHeaders, accountId, project, deployment.id);
-        fetch(slackWebHook, {
+        fetch(dingWebHook, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: "text",
-            text: { content: `\u274C CloudFlare Pages \`${latestStage.name}\` \u6D41\u6C34\u7EBF\u9879\u76EE *${project}* \`\u5931\u8D25\`\uFF01
-        \u73AF\u5883\uFF1A*${deployment.environment}*
-        \u63D0\u4EA4\uFF1A${commitUrl}
-        \u6267\u884C\u8005\uFF1A*${actor}*
-        \u90E8\u7F72 ID\uFF1A*${deployment.id}*
+            text: { content: `\u274C CloudFlare Pages \`${latestStage.name}\` \u6D41\u6C34\u7EBF\u9879\u76EE ${project} \`\u5931\u8D25\`\uFF01
+        \u73AF\u5883\uFF1A ${deployment.environment}
+        \u63D0\u4EA4\uFF1A ${commitUrl}
+        \u6267\u884C\u8005\uFF1A ${actor}
+        \u90E8\u7F72 ID\uFF1A ${deployment.id}
         \u90E8\u7F72\u65E5\u5FD7\uFF1A${logs}` }
           })
         }).then((response) => {
@@ -12778,20 +12779,20 @@ async function run() {
       core.setOutput("alias", aliasUrl);
       core.setOutput("success", deployment.latest_stage.status === "success" ? true : false);
       if (deployment.latest_stage.status === "success" && true) {
-        fetch(slackWebHook, {
+        fetch(dingWebHook, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: "text",
-            text: { content: `\u2705 CloudFlare Pages \u9879\u76EE\u7684 \`\u90E8\u7F72\` \u6D41\u6C34\u7EBF *${project}* \`\u6210\u529F\`\uFF01
-        \u73AF\u5883\uFF1A*${deployment.environment}*
+            text: { content: `\u2705 CloudFlare Pages \u9879\u76EE\u7684 \`\u90E8\u7F72\` \u6D41\u6C34\u7EBF\u9879\u76EE ${project} \`\u6210\u529F\`\uFF01
+        \u73AF\u5883\uFF1A${deployment.environment}
         \u63D0\u4EA4\uFF1A${commitUrl}
-        \u6267\u884C\u8005\uFF1A*${actor}*
-        \u90E8\u7F72 ID\uFF1A*${deployment.id}*
-        \u522B\u540D URL\uFF1A${aliasUrl}
-        \u90E8\u7F72 URL\uFF1A${deployment.url}
-        \u67E5\u770B <https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}|\u6784\u5EFA\u65E5\u5FD7>` }
+        \u6267\u884C\u8005\uFF1A${actor}
+        \u90E8\u7F72 ID\uFF1A ${deployment.id}
+        \u522B\u540D URL\uFF1A ${aliasUrl}
+        \u90E8\u7F72 URL\uFF1A ${deployment.url}
+        \u67E5\u770B\u6784\u5EFA\u65E5\u5FD7: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}` }
           })
         }).then((response) => {
           if (!response.ok) {
