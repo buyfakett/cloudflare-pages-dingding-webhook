@@ -31,7 +31,7 @@ export default async function run() {
 
   const authHeaders: AuthHeaders = apiToken !== '' ? { Authorization: `Bearer ${apiToken}` } : { 'X-Auth-Email': accountEmail, 'X-Auth-Key': apiKey };
 
-  console.log('等待Pages完成构建...');
+  console.log('等待CloudFlare Pages完成构建...');
   let lastStage = '';
 
   while (waiting) {
@@ -74,7 +74,7 @@ export default async function run() {
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: 'text',
-            text: { content: `❌ CloudFlare Pages \`${latestStage.name}\` 流水线项目 ${project} \`失败\`！
+            text: { content: `❌ CloudFlare Pages ${latestStage.name} 流水线项目 ${project} 失败！
         环境： ${deployment.environment}
         提交： ${commitUrl}
         执行者： ${actor}
@@ -150,7 +150,7 @@ export default async function run() {
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: 'text',
-            text: { content: `✅ CloudFlare Pages 项目的 \`部署\` 流水线项目 ${project} \`成功\`！
+            text: { content: `✅ CloudFlare Pages 项目的部署流水线项目 ${project} 成功！
         环境：${deployment.environment}
         提交：${commitUrl}
         执行者：${actor}
