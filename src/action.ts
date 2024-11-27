@@ -4,7 +4,6 @@ import fetch, { Response } from 'node-fetch';
 
 import { context } from '@actions/github/lib/utils';
 import { ApiResponse, AuthHeaders, Deployment } from './types';
-import SlackNotify from 'slack-notify';
 
 let waiting = true;
 // @ts-ignore - Typing GitHub's responses is a pain in the ass
@@ -21,7 +20,6 @@ export default async function run() {
   const token = core.getInput('githubToken', { required: false, trimWhitespace: true });
   const commitHash = core.getInput('commitHash', { required: false, trimWhitespace: true });
   const slackWebHook = core.getInput('slackWebHook', { required: false, trimWhitespace: true });
-  const slack = SlackNotify(slackWebHook);
   const commitUrl = context.payload?.head_commit?.url || '';
   const actor = context?.actor || '';
 
@@ -69,10 +67,27 @@ export default async function run() {
 
       if (slackWebHook) {
         const logs = await getCloudflareLogs(authHeaders, accountId, project, deployment.id);
-        slack.send(`:x: CloudFlare Pages \`${latestStage.name}\` pipeline for project *${project}* \`FAILED\`!\nEnvironment: *${deployment.environment}*\nCommit: ${commitUrl}\nActor: *${actor}*\nDeployment ID: *${deployment.id}*\nDeployment Logs: ${logs}\n`).then(() => {
-          console.log(`Slack message for ${latestStage.name} failed pipeline sent!`);
-        }).catch((err) => {
-          console.error(err);
+        fetch(slackWebHook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            at: { isAtAll: true },
+            msgtype: 'text',
+            text: { content: `❌ CloudFlare Pages \`${latestStage.name}\` 流水线项目 *${project}* \`失败\`！
+        环境：*${deployment.environment}*
+        提交：${commitUrl}
+        执行者：*${actor}*
+        部署 ID：*${deployment.id}*
+        部署日志：${logs}` }
+          })
+        }).then(response => {
+          if (!response.ok) {
+            console.error('钉消息发送失败！', response.statusText);
+          } else {
+            console.log('钉消息发送成功！', response.statusText);
+          }
+        }).catch(err => {
+          console.error('发送钉钉消息时出错：', err);
         });
       }
       core.setFailed(`Deployment failed on step: ${latestStage.name}!`);
@@ -145,12 +160,12 @@ export default async function run() {
           })
         }).then(response => {
           if (!response.ok) {
-            console.error('DingTalk message failed to send!', response.statusText);
+            console.error('钉消息发送失败！', response.statusText);
           } else {
-            console.log('DingTalk message sent successfully!');
+            console.log('钉消息发送成功！', response.statusText);
           }
         }).catch(err => {
-          console.error('Error sending DingTalk message:', err);
+          console.error('发送钉钉消息时出错：', err);
         });        
       }
       // Update deployment (if enabled)

@@ -782,7 +782,7 @@ var require_tunnel = __commonJS({
     var net = require("net");
     var tls = require("tls");
     var http3 = require("http");
-    var https3 = require("https");
+    var https2 = require("https");
     var events = require("events");
     var assert = require("assert");
     var util = require("util");
@@ -804,12 +804,12 @@ var require_tunnel = __commonJS({
     }
     function httpOverHttps(options) {
       var agent = new TunnelingAgent(options);
-      agent.request = https3.request;
+      agent.request = https2.request;
       return agent;
     }
     function httpsOverHttps(options) {
       var agent = new TunnelingAgent(options);
-      agent.request = https3.request;
+      agent.request = https2.request;
       agent.createSocket = createSecureSocket;
       agent.defaultPort = 443;
       return agent;
@@ -1067,7 +1067,7 @@ var require_lib = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HttpClient = exports.isHttps = exports.HttpClientResponse = exports.HttpClientError = exports.getProxyUrl = exports.MediaTypes = exports.Headers = exports.HttpCodes = void 0;
     var http3 = __importStar(require("http"));
-    var https3 = __importStar(require("https"));
+    var https2 = __importStar(require("https"));
     var pm = __importStar(require_proxy());
     var tunnel = __importStar(require_tunnel2());
     var HttpCodes;
@@ -1407,7 +1407,7 @@ var require_lib = __commonJS({
         const info = {};
         info.parsedUrl = requestUrl;
         const usingSsl = info.parsedUrl.protocol === "https:";
-        info.httpModule = usingSsl ? https3 : http3;
+        info.httpModule = usingSsl ? https2 : http3;
         const defaultPort = usingSsl ? 443 : 80;
         info.options = {};
         info.options.host = info.parsedUrl.hostname;
@@ -1477,11 +1477,11 @@ var require_lib = __commonJS({
         }
         if (this._keepAlive && !agent) {
           const options = { keepAlive: this._keepAlive, maxSockets };
-          agent = usingSsl ? new https3.Agent(options) : new http3.Agent(options);
+          agent = usingSsl ? new https2.Agent(options) : new http3.Agent(options);
           this._agent = agent;
         }
         if (!agent) {
-          agent = usingSsl ? https3.globalAgent : http3.globalAgent;
+          agent = usingSsl ? https2.globalAgent : http3.globalAgent;
         }
         if (usingSsl && this._ignoreSslError) {
           agent.options = Object.assign(agent.options || {}, {
@@ -2311,7 +2311,7 @@ var require_http_client = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var http3 = require("http");
-    var https3 = require("https");
+    var https2 = require("https");
     var pm = require_proxy2();
     var tunnel;
     var HttpCodes;
@@ -2615,7 +2615,7 @@ var require_http_client = __commonJS({
         const info = {};
         info.parsedUrl = requestUrl;
         const usingSsl = info.parsedUrl.protocol === "https:";
-        info.httpModule = usingSsl ? https3 : http3;
+        info.httpModule = usingSsl ? https2 : http3;
         const defaultPort = usingSsl ? 443 : 80;
         info.options = {};
         info.options.host = info.parsedUrl.hostname;
@@ -2694,11 +2694,11 @@ var require_http_client = __commonJS({
         }
         if (this._keepAlive && !agent) {
           const options = { keepAlive: this._keepAlive, maxSockets };
-          agent = usingSsl ? new https3.Agent(options) : new http3.Agent(options);
+          agent = usingSsl ? new https2.Agent(options) : new http3.Agent(options);
           this._agent = agent;
         }
         if (!agent) {
-          agent = usingSsl ? https3.globalAgent : http3.globalAgent;
+          agent = usingSsl ? https2.globalAgent : http3.globalAgent;
         }
         if (usingSsl && this._ignoreSslError) {
           agent.options = Object.assign(agent.options || {}, {
@@ -5092,7 +5092,7 @@ var require_lib3 = __commonJS({
     var http3 = _interopDefault(require("http"));
     var Url = _interopDefault(require("url"));
     var whatwgUrl = _interopDefault(require_public_api());
-    var https3 = _interopDefault(require("https"));
+    var https2 = _interopDefault(require("https"));
     var zlib2 = _interopDefault(require("zlib"));
     var Readable = Stream3.Readable;
     var BUFFER = Symbol("buffer");
@@ -5964,7 +5964,7 @@ var require_lib3 = __commonJS({
       return new fetch2.Promise(function(resolve, reject) {
         const request = new Request2(url, opts);
         const options = getNodeRequestOptions2(request);
-        const send = (options.protocol === "https:" ? https3 : http3).request;
+        const send = (options.protocol === "https:" ? https2 : http3).request;
         const signal = request.signal;
         let response = null;
         const abort = function abort2() {
@@ -12665,104 +12665,6 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 
 // src/action.ts
 var import_utils = __toModule(require_utils4());
-
-// node_modules/slack-notify/src/esm/index.mjs
-var import_https2 = __toModule(require("https"));
-var import_buffer = __toModule(require("buffer"));
-var NO_URL_ERROR = "No Slack URL configured.";
-function isString(str) {
-  return typeof str === "string";
-}
-var esm_default = (url) => {
-  const pub = {};
-  pub.request = (data) => {
-    return new Promise((resolve, reject) => {
-      if (!url) {
-        return reject(NO_URL_ERROR);
-      }
-      post(url, JSON.stringify(data)).then((resBody) => {
-        if (resBody !== "ok") {
-          reject(resBody);
-        } else {
-          resolve();
-        }
-      }).catch(reject);
-    });
-  };
-  pub.send = (options) => {
-    if (isString(options)) {
-      options = { text: options };
-    }
-    const data = Object.assign({}, options);
-    if (options.fields) {
-      if (!data.attachments) {
-        data.attachments = [];
-      }
-      data.attachments.push({
-        fallback: "Alert details",
-        fields: Object.values(options.fields).map((value, index) => {
-          const title = Object.keys(options.fields)[index];
-          return {
-            title,
-            value,
-            short: (value + "").length < 25
-          };
-        })
-      });
-      delete data.fields;
-    }
-    if (options.icon_url && !options.icon_emoji) {
-      delete data.icon_emoji;
-    }
-    return pub.request(data);
-  };
-  pub.extend = (defaults) => (options) => {
-    if (isString(options)) {
-      options = { text: options };
-    }
-    return pub.send(Object.assign({}, defaults, options));
-  };
-  pub.success = pub.extend({
-    channel: "#alerts",
-    icon_emoji: ":trophy:",
-    username: "Success"
-  });
-  pub.bug = pub.extend({
-    channel: "#bugs",
-    icon_emoji: ":bomb:",
-    username: "Bug"
-  });
-  pub.alert = pub.extend({
-    channel: "#alerts",
-    icon_emoji: ":warning:",
-    username: "Alert"
-  });
-  return pub;
-};
-function post(url, body) {
-  return new Promise((resolve, reject) => {
-    const req = import_https2.default.request(url, { method: "POST" }, (res) => {
-      const chunks = [];
-      res.on("data", (data) => chunks.push(data));
-      res.on("end", () => {
-        let resBody = import_buffer.Buffer.concat(chunks).toString();
-        switch (res.headers["content-type"]) {
-          case "application/json":
-            resBody = JSON.parse(resBody);
-            break;
-        }
-        resolve(resBody);
-      });
-    });
-    req.on("error", reject);
-    if (body) {
-      req.write(body);
-    }
-    req.end();
-  });
-}
-
-// src/action.ts
 var waiting = true;
 var ghDeployment;
 var markedAsInProgress = false;
@@ -12776,7 +12678,6 @@ async function run() {
   const token = core.getInput("githubToken", { required: false, trimWhitespace: true });
   const commitHash = core.getInput("commitHash", { required: false, trimWhitespace: true });
   const slackWebHook = core.getInput("slackWebHook", { required: false, trimWhitespace: true });
-  const slack = esm_default(slackWebHook);
   const commitUrl = ((_b = (_a2 = import_utils.context.payload) == null ? void 0 : _a2.head_commit) == null ? void 0 : _b.url) || "";
   const actor = ((_c = import_utils.context) == null ? void 0 : _c.actor) || "";
   if (!validateAuthInputs(apiToken, accountEmail, apiKey)) {
@@ -12811,16 +12712,27 @@ async function run() {
       waiting = false;
       if (slackWebHook) {
         const logs = await getCloudflareLogs(authHeaders, accountId, project, deployment.id);
-        slack.send(`:x: CloudFlare Pages \`${latestStage.name}\` pipeline for project *${project}* \`FAILED\`!
-Environment: *${deployment.environment}*
-Commit: ${commitUrl}
-Actor: *${actor}*
-Deployment ID: *${deployment.id}*
-Deployment Logs: ${logs}
-`).then(() => {
-          console.log(`Slack message for ${latestStage.name} failed pipeline sent!`);
+        fetch(slackWebHook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            at: { isAtAll: true },
+            msgtype: "text",
+            text: { content: `\u274C CloudFlare Pages \`${latestStage.name}\` \u6D41\u6C34\u7EBF\u9879\u76EE *${project}* \`\u5931\u8D25\`\uFF01
+        \u73AF\u5883\uFF1A*${deployment.environment}*
+        \u63D0\u4EA4\uFF1A${commitUrl}
+        \u6267\u884C\u8005\uFF1A*${actor}*
+        \u90E8\u7F72 ID\uFF1A*${deployment.id}*
+        \u90E8\u7F72\u65E5\u5FD7\uFF1A${logs}` }
+          })
+        }).then((response) => {
+          if (!response.ok) {
+            console.error("\u9489\u6D88\u606F\u53D1\u9001\u5931\u8D25\uFF01", response.statusText);
+          } else {
+            console.log("\u9489\u6D88\u606F\u53D1\u9001\u6210\u529F\uFF01", response.statusText);
+          }
         }).catch((err) => {
-          console.error(err);
+          console.error("\u53D1\u9001\u9489\u9489\u6D88\u606F\u65F6\u51FA\u9519\uFF1A", err);
         });
       }
       core.setFailed(`Deployment failed on step: ${latestStage.name}!`);
@@ -12883,12 +12795,12 @@ Deployment Logs: ${logs}
           })
         }).then((response) => {
           if (!response.ok) {
-            console.error("DingTalk message failed to send!", response.statusText);
+            console.error("\u9489\u6D88\u606F\u53D1\u9001\u5931\u8D25\uFF01", response.statusText);
           } else {
-            console.log("DingTalk message sent successfully!");
+            console.log("\u9489\u6D88\u606F\u53D1\u9001\u6210\u529F\uFF01", response.statusText);
           }
         }).catch((err) => {
-          console.error("Error sending DingTalk message:", err);
+          console.error("\u53D1\u9001\u9489\u9489\u6D88\u606F\u65F6\u51FA\u9519\uFF1A", err);
         });
       }
       if (token !== "") {
