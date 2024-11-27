@@ -1,4 +1,4 @@
-name: 'Cloudflare Pages Slack Notification'
+name: 'Cloudflare Pages Dingding Webhook'
 description: 'Wait for Cloudflare Pages to build and send Slack notification'
 author: 'arddluma'
 inputs:
