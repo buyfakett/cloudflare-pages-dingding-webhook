@@ -1,5 +1,6 @@
-# CloudFlare Pages Slack notification
+# Cloudflare Pages Dingding Webhook
 ## Using [CF Pages Await](https://github.com/WalshyDev/cf-pages-await) made by Daniel Walsh [WalshyDev](https://github.com/WalshyDev)
+## This project is a fork of [cloudflare-pages-slack-notification](https://github.com/arddluma/cloudflare-pages-slack-notification)made by Daniel Walsh [arddluma](https://github.com/arddluma)
 
 Wait for Cloudflare Pages build to finish and send Slack notification
 
@@ -24,8 +25,7 @@ Generate API Token go to https://dash.cloudflare.com/profile/api-tokens
     project: ${{ secrets.CF_PAGES_PROJECT  }}
     # Add this if you want GitHub Deployments (see below)
     githubToken: ${{ secrets.GITHUB_TOKEN }}
-    # Create Slack Incoming webhook and add as variable https://hooks.slack.com/...
-    slackWebHook: ${{ secrets.SLACK_WEBHOOK  }}
+    dingWebHookKey: ${{ secrets.DING_WEBHOOK_KEY }}
     # Add this if you want to wait for a deployment triggered by a specfied commit
     commitHash: ${{ steps.push-changes.outputs.commit-hash }}
 ```
@@ -53,20 +53,10 @@ jobs:
         # CloudFlare Pages project name
         project: ${{ secrets.CF_PAGES_PROJECT  }}
         # Create Slack Incoming webhook and add as variable https://hooks.slack.com/...
-        slackWebHook: ${{ secrets.SLACK_WEBHOOK  }}
+        dingWebHookKey: ${{ secrets.DING_WEBHOOK_KEY }}
         # Add this if you want GitHub Deployments (see below)
         githubToken: ${{ secrets.GITHUB_TOKEN }}
 ```
-
-## Screenshots
-
-### If build phase fails:
-
-  ![Build Fails](.github/images/build-failed.png)
-
-### If deployment phase is successful:
-
-  ![Deployment Successful](.github/images/deployment-succeeded.png)
 
 ## Outputs
 * `id`          - Deployment ID, example: `50ff553c-da5d-4846-8188-25ae82a3bb7d`
