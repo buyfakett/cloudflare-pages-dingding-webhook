@@ -12685,7 +12685,7 @@ async function run() {
     return;
   }
   const authHeaders = apiToken !== "" ? { Authorization: `Bearer ${apiToken}` } : { "X-Auth-Email": accountEmail, "X-Auth-Key": apiKey };
-  console.log("\u7B49\u5F85Pages\u5B8C\u6210\u6784\u5EFA...");
+  console.log("\u7B49\u5F85CloudFlare Pages\u5B8C\u6210\u6784\u5EFA...");
   let lastStage = "";
   while (waiting) {
     await sleep();
@@ -12719,7 +12719,7 @@ async function run() {
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: "text",
-            text: { content: `\u274C CloudFlare Pages \`${latestStage.name}\` \u6D41\u6C34\u7EBF\u9879\u76EE ${project} \`\u5931\u8D25\`\uFF01
+            text: { content: `\u274C CloudFlare Pages ${latestStage.name} \u6D41\u6C34\u7EBF\u9879\u76EE ${project} \u5931\u8D25\uFF01
         \u73AF\u5883\uFF1A ${deployment.environment}
         \u63D0\u4EA4\uFF1A ${commitUrl}
         \u6267\u884C\u8005\uFF1A ${actor}
@@ -12785,7 +12785,7 @@ async function run() {
           body: JSON.stringify({
             at: { isAtAll: true },
             msgtype: "text",
-            text: { content: `\u2705 CloudFlare Pages \u9879\u76EE\u7684 \`\u90E8\u7F72\` \u6D41\u6C34\u7EBF\u9879\u76EE ${project} \`\u6210\u529F\`\uFF01
+            text: { content: `\u2705 CloudFlare Pages \u9879\u76EE\u7684\u90E8\u7F72\u6D41\u6C34\u7EBF\u9879\u76EE ${project} \u6210\u529F\uFF01
         \u73AF\u5883\uFF1A${deployment.environment}
         \u63D0\u4EA4\uFF1A${commitUrl}
         \u6267\u884C\u8005\uFF1A${actor}
