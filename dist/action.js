@@ -12866,17 +12866,29 @@ Deployment Logs: ${logs}
       core.setOutput("alias", aliasUrl);
       core.setOutput("success", deployment.latest_stage.status === "success" ? true : false);
       if (deployment.latest_stage.status === "success" && true) {
-        slack.send(`:white_check_mark: CloudFlare Pages \`Deployment\` pipeline for project *${project}* \`SUCCEEDED\`!
-Environment: *${deployment.environment}*
-Commit: ${commitUrl}
-Actor: *${actor}*
-Deployment ID: *${deployment.id}*
-Alias URL: ${aliasUrl}
-Deployment URL: ${deployment.url}
-Checkout <https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}|build logs>`).then(() => {
-          console.log("Slack message for DEPLOYMENT succedded pipeline sent!");
+        fetch(slackWebHook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            at: { isAtAll: true },
+            msgtype: "text",
+            text: { content: `\u2705 CloudFlare Pages \u9879\u76EE\u7684 \`\u90E8\u7F72\` \u6D41\u6C34\u7EBF *${project}* \`\u6210\u529F\`\uFF01
+        \u73AF\u5883\uFF1A*${deployment.environment}*
+        \u63D0\u4EA4\uFF1A${commitUrl}
+        \u6267\u884C\u8005\uFF1A*${actor}*
+        \u90E8\u7F72 ID\uFF1A*${deployment.id}*
+        \u522B\u540D URL\uFF1A${aliasUrl}
+        \u90E8\u7F72 URL\uFF1A${deployment.url}
+        \u67E5\u770B <https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}|\u6784\u5EFA\u65E5\u5FD7>` }
+          })
+        }).then((response) => {
+          if (!response.ok) {
+            console.error("DingTalk message failed to send!", response.statusText);
+          } else {
+            console.log("DingTalk message sent successfully!");
+          }
         }).catch((err) => {
-          console.error(err);
+          console.error("Error sending DingTalk message:", err);
         });
       }
       if (token !== "") {
