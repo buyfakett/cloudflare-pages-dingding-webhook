@@ -78,6 +78,7 @@ export default async function run() {
         提交： ${commitUrl}
         执行者： ${actor}
         部署 ID： ${deployment.id}
+        查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}
         部署日志：${logs}` }
           })
         }).then(response => {
