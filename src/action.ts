@@ -74,12 +74,13 @@ export default async function run() {
           body: JSON.stringify({
             msgtype: 'text',
             text: { content: `❌ CloudFlare Pages ${latestStage.name} 流水线项目 ${project} 失败！
-        环境： ${deployment.environment}
-        提交： ${commitUrl}
-        执行者： ${actor}
-        部署 ID： ${deployment.id}
-        查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}
-        部署日志：${logs}` }
+环境： ${deployment.environment}
+提交： ${commitUrl}
+执行者： ${actor}
+部署 ID： ${deployment.id}
+查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}
+部署日志：${logs}`
+            }
           })
         }).then(response => {
           if (!response.ok) {
@@ -150,13 +151,14 @@ export default async function run() {
           body: JSON.stringify({
             msgtype: 'text',
             text: { content: `✅ CloudFlare Pages 项目的部署流水线项目 ${project} 成功！
-        环境：${deployment.environment}
-        提交：${commitUrl}
-        执行者：${actor}
-        部署 ID： ${deployment.id}
-        别名 URL： ${aliasUrl}
-        部署 URL： ${deployment.url}
-        查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}` }
+环境：${deployment.environment}
+提交：${commitUrl}
+执行者：${actor}
+部署 ID： ${deployment.id}
+别名 URL： ${aliasUrl}
+部署 URL： ${deployment.url}
+查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}`
+            }
           })
         }).then(response => {
           if (!response.ok) {
