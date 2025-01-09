@@ -92,7 +92,7 @@ export default async function run() {
           console.error('发送钉钉消息时出错：', err);
         });
       }
-      core.setFailed(`Deployment failed on step: ${latestStage.name}!`);
+      core.setFailed(`步骤部署失败: ${latestStage.name}!`);
       await updateDeployment(token, deployment, 'failure');
       return;
     }
@@ -103,7 +103,7 @@ export default async function run() {
         });
     
         if (!res.ok) {
-          console.error(`Failed to fetch Cloudflare logs - Status code: ${res.status} (${res.statusText})`);
+          console.error(`无法获取Cloudflare日志-状态代码: ${res.status} (${res.statusText})`);
           return '';
         }
     
@@ -127,7 +127,7 @@ export default async function run() {
           return '';
         }
       } catch (error) {
-        console.error(`Failed to fetch Cloudflare logs: ${error.message}`);
+        console.error(`无法获取Cloudflare日志: ${error.message}`);
         return '';
       }
     }
@@ -187,7 +187,7 @@ function validateAuthInputs(token: string, email: string, key: string) {
     return true;
   }
 
-  core.setFailed('Please specify authentication details! Set either `apiToken` or `accountEmail` + `accountKey`!');
+  core.setFailed('请指定身份验证详细信息！设置“apiToken”或“accountEmail”+“accountKey”！');
   return false;
 }
 
@@ -204,7 +204,7 @@ async function pollApi(authHeaders: AuthHeaders, accountId: string, project: str
     });
   } catch(e) {
     // @ts-ignore
-    core.error(`Failed to send request to CF API - network issue? ${e.message}`);
+    core.error(`向CF API发送请求失败-网络问题？ ${e.message}`);
     // @ts-ignore
     core.setFailed(e);
     return;
@@ -214,7 +214,7 @@ async function pollApi(authHeaders: AuthHeaders, accountId: string, project: str
   try {
     body = await res.json() as ApiResponse;
   } catch(e) {
-    core.error(`CF API did not return a JSON (possibly down?) - Status code: ${res.status} (${res.statusText})`);
+    core.error(`CF API未返回JSON（可能关闭？）-状态代码: ${res.status} (${res.statusText})`);
     // @ts-ignore
     core.setFailed(e);
     return;
@@ -222,8 +222,8 @@ async function pollApi(authHeaders: AuthHeaders, accountId: string, project: str
 
   if (!body.success) {
     waiting = false;
-    const error = body.errors.length > 0 ? body.errors[0] : 'Unknown error!';
-    core.setFailed(`Failed to check deployment status! Error: ${JSON.stringify(error)}`);
+    const error = body.errors.length > 0 ? body.errors[0] : '位置错误!';
+    core.setFailed(`检查部署状态失败！错误: ${JSON.stringify(error)}`);
     return;
   }
 
@@ -283,7 +283,7 @@ async function updateDeployment(token: string, deployment: Deployment, state: 's
 try {
   run();
 } catch(e) {
-  console.error('Please report this! Issues: https://github.com/WalshyDev/cf-pages-await/issues');
+  console.error('请报告问题: https://github.com/WalshyDev/cf-pages-await/issues');
   // @ts-ignore
   core.setFailed(e);
   // @ts-ignore
