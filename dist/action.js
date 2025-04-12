@@ -29119,7 +29119,7 @@ async function run() {
   const commitHash = core.getInput("commitHash", { required: false, trimWhitespace: true });
   const commitMessage = require("child_process").execSync('git log -1 --pretty=format:"%s"').toString().trim();
   const commitAuthor = require("child_process").execSync('git log -1 --pretty=format:"%an"').toString().trim();
-  const commitDate = require("child_process").execSync('git log -1 --pretty=format:"%cd" --date=format:"%Y-%m-%d %H:%M UTC+8" --date=+8hours').toString().trim();
+  const commitDate = require("child_process").execSync('TZ=Asia/Shanghai git log -1 --pretty=format:"%cd" --date=format:"%Y-%m-%d %H:%M UTC+8"').toString().trim();
   const dingWebHookKey = core.getInput("dingWebHookKey", { required: false, trimWhitespace: true });
   const dingWebHook = dingWebHookKey ? `https://oapi.dingtalk.com/robot/send?access_token=${dingWebHookKey}` : "";
   const commitUrl = ((_b = (_a4 = import_utils.context.payload) == null ? void 0 : _a4.head_commit) == null ? void 0 : _b.url) || "";

@@ -3,13 +3,16 @@ description: 'Wait for Cloudflare Pages to build and send Slack notification'
 author: 'arddluma'
 inputs:
   accountEmail:
-    description: 'Cloudflare account email (Not recommended)'
+    description: 'Your Cloudflare account email'
     required: false
   apiKey:
-    description: 'Cloudflare API Key (Not recommended)'
+    description: 'Your Cloudflare API key'
     required: false
   apiToken:
-    description: 'Cloudflare API Token (Recommended)'
+    description: 'Your Cloudflare API token (alternative to email+key)'
+    required: false
+  dingWebHookKey:
+    description: 'DingTalk webhook access token'
     required: false
   accountId:
     description: 'Cloudflare account ID'

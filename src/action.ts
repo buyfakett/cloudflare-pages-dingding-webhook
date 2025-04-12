@@ -22,7 +22,7 @@ export default async function run() {
   // 获取git commit信息
   const commitMessage = require('child_process').execSync('git log -1 --pretty=format:"%s"').toString().trim();
   const commitAuthor = require('child_process').execSync('git log -1 --pretty=format:"%an"').toString().trim();
-  const commitDate = require('child_process').execSync('git log -1 --pretty=format:"%cd" --date=format:"%Y-%m-%d %H:%M UTC+8" --date=+8hours').toString().trim();
+  const commitDate = require('child_process').execSync('TZ=Asia/Shanghai git log -1 --pretty=format:"%cd" --date=format:"%Y-%m-%d %H:%M UTC+8"').toString().trim();
   
   const dingWebHookKey = core.getInput('dingWebHookKey', { required: false, trimWhitespace: true });
   const dingWebHook = dingWebHookKey ? `https://oapi.dingtalk.com/robot/send?access_token=${dingWebHookKey}` : '';
