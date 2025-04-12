@@ -22,7 +22,7 @@ export default async function run() {
   // 获取git commit信息
   const commitMessage = require('child_process').execSync('git log -1 --pretty=format:"%s"').toString().trim();
   const commitAuthor = require('child_process').execSync('git log -1 --pretty=format:"%an"').toString().trim();
-  const commitDate = require('child_process').execSync('git log -1 --pretty=format:"%cd"').toString().trim();
+  const commitDate = require('child_process').execSync('git log -1 --pretty=format:"%cd" --date=format:"%Y-%m-%d %H:%M UTC+8" --date=+8hours').toString().trim();
   
   const dingWebHookKey = core.getInput('dingWebHookKey', { required: false, trimWhitespace: true });
   const dingWebHook = dingWebHookKey ? `https://oapi.dingtalk.com/robot/send?access_token=${dingWebHookKey}` : '';
@@ -83,7 +83,6 @@ export default async function run() {
 提交： ${commitUrl}
 提交信息：${commitMessage}
 提交者：${commitAuthor} (${commitDate})
-执行者： ${actor}
 部署 ID： ${deployment.id}
 查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}
 部署日志：${logs}`
@@ -162,7 +161,6 @@ export default async function run() {
 提交：${commitUrl}
 提交信息：${commitMessage}
 提交者：${commitAuthor} (${commitDate}) 
-执行者：${actor}
 部署 ID： ${deployment.id}
 别名 URL： ${aliasUrl}
 部署 URL： ${deployment.url}
