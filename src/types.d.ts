@@ -76,6 +76,7 @@ export interface Deployment {
   url: string;
   created_on: string;
   modified_on: string;
+  is_skipped?: boolean;
 
   latest_stage: Stage;
   deployment_trigger: Trigger;
@@ -88,7 +89,7 @@ export interface Stage {
   name: 'queued'|'initialize'|'clone_repo'|'build'|'deploy';
   started_on: string;
   ended_on: string;
-  status: 'idle'|'active'|'success'|'failed'
+  status: 'idle'|'active'|'success'|'failed'|'failure'
 }
 
 export interface Trigger {

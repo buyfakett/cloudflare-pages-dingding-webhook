@@ -19,6 +19,11 @@ export default async function run() {
   const project = core.getInput('project', { required: true, trimWhitespace: true });
   const token = core.getInput('githubToken', { required: false, trimWhitespace: true });
   const commitHash = core.getInput('commitHash', { required: false, trimWhitespace: true });
+  // 获取git commit信息
+  const commitMessage = require('child_process').execSync('git log -1 --pretty=format:"%s"').toString().trim();
+  const commitAuthor = require('child_process').execSync('git log -1 --pretty=format:"%an"').toString().trim();
+  const commitDate = require('child_process').execSync('git log -1 --pretty=format:"%cd"').toString().trim();
+  
   const dingWebHookKey = core.getInput('dingWebHookKey', { required: false, trimWhitespace: true });
   const dingWebHook = dingWebHookKey ? `https://oapi.dingtalk.com/robot/send?access_token=${dingWebHookKey}` : '';
   const commitUrl = context.payload?.head_commit?.url || '';
@@ -44,10 +49,10 @@ export default async function run() {
       continue;
     }
 
-    if (deployment.is_skipped === true) {
+    if ((deployment as any).is_skipped === true) {
       waiting = false;
       console.log(`Deployment skipped ${deployment.id}!`);
-      core.setOutput(`Deployment skipped ${deployment.id}!`);
+      core.setOutput('status', `Deployment skipped ${deployment.id}!`);
       return;
     }
 
@@ -63,7 +68,7 @@ export default async function run() {
       }
     }
 
-    if (latestStage.status === 'failed' || latestStage.status === 'failure') {
+    if (latestStage.status === 'failed') {
       waiting = false;
 
       if (dingWebHook) {
@@ -76,6 +81,8 @@ export default async function run() {
             text: { content: `❌ CloudFlare Pages ${latestStage.name} 流水线项目 ${project} 失败！
 环境： ${deployment.environment}
 提交： ${commitUrl}
+提交信息：${commitMessage}
+提交者：${commitAuthor} (${commitDate})
 执行者： ${actor}
 部署 ID： ${deployment.id}
 查看构建日志: https://dash.cloudflare.com?to=/${accountId}/pages/view/${deployment.project_name}/${deployment.id}
@@ -107,10 +114,10 @@ export default async function run() {
           return '';
         }
     
-        const body = await res.json();
+        const body = await res.json() as any;
     
         if (Array.isArray(body.result?.data) && body.result.data.length > 0) {
-          const logs = body.result.data.map((log: any) => {
+          const logs = (body.result.data as Array<any>).map((log) => {
             return {
               line: log.line,
             };
@@ -126,7 +133,7 @@ export default async function run() {
         } else {
           return '';
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`无法获取Cloudflare日志: ${error.message}`);
         return '';
       }
@@ -153,6 +160,8 @@ export default async function run() {
             text: { content: `✅ CloudFlare Pages 项目的部署流水线项目 ${project} 成功！
 环境：${deployment.environment}
 提交：${commitUrl}
+提交信息：${commitMessage}
+提交者：${commitAuthor} (${commitDate}) 
 执行者：${actor}
 部署 ID： ${deployment.id}
 别名 URL： ${aliasUrl}
